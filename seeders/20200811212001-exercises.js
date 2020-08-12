@@ -10,12 +10,14 @@ module.exports = {
           explanation: "this is an explanation of the exercise! DO IT!",
           createdAt: new Date(),
           updatedAt: new Date(),
+          userId: 1,
         },
         {
           description: "Find the answer",
           explanation: "this is an explanation of the exercise! DO IT!",
           createdAt: new Date(),
           updatedAt: new Date(),
+          userId: 1,
         },
       ],
       {}

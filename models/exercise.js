@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      exercise.belongsToMany(models.user);
-      exercise.hasMany(models.testcase);
+      exercise.hasMany(models.testCase);
+      exercise.belongsTo(models.user);
     }
   }
   exercise.init(
