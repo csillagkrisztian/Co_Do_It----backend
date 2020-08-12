@@ -1,6 +1,6 @@
 {
   "development": {
-    "url": "YOUR_ELEPHANTSQL_URL_HERE",
+    "url": "postgres://uqvqxtjs:5Plgt1ALXIDrkOa3AH3jU0ms831kpfnG@kandula.db.elephantsql.com:5432/uqvqxtjs",
     "dialect": "postgres",
     "operatorsAliases": "0"
   },
