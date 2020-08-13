@@ -9,7 +9,11 @@ router.get("/random", async (req, res, next) => {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
-  const allExerciseIds = await Exercise.findAll({ attributes: ["id"] });
+  const allExerciseIds = await Exercise.findAll({
+    where: { isPublic: true },
+    attributes: ["id"],
+  });
+
   const availableExercises = allExerciseIds.map((e) => e.dataValues.id);
   const randomIndex = getRandomInt(availableExercises.length);
   const neededExercise = availableExercises[randomIndex];
@@ -19,7 +23,7 @@ router.get("/random", async (req, res, next) => {
     include: [TestCase],
   });
 
-  res.send(randomExercise);
+  res.status(200).send(randomExercise);
 });
 
 module.exports = router;
