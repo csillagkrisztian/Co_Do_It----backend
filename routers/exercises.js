@@ -29,8 +29,9 @@ router.get("/random", async (req, res, next) => {
 
 router.post("/create", authMiddleware, async (req, res, next) => {
   try {
+    console.log(req.body);
     const { description, explanation, isPublic, testCases } = req.body;
-    if (!description || !explanation || !isPublic || !testCases) {
+    if (!description || !explanation || isPublic === undefined || !testCases) {
       res.status(400).send({ message: "Missing credentials!" });
     }
     const newExercise = await Exercise.create({
@@ -39,8 +40,7 @@ router.post("/create", authMiddleware, async (req, res, next) => {
       isPublic,
       userId: req.user.id,
     });
-    const parsedTestCases = JSON.parse(testCases);
-    const newTestCases = parsedTestCases.map(
+    const newTestCases = testCases.map(
       async (tc) => await TestCase.create({ ...tc, exerciseId: newExercise.id })
     );
     await Promise.all(newTestCases);
