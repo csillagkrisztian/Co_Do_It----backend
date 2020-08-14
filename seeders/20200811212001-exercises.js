@@ -11,6 +11,7 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           userId: 1,
+          isPublic: true,
         },
         {
           description: "Find the answer",
@@ -18,6 +19,7 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           userId: 1,
+          isPublic: true,
         },
       ],
       {}
