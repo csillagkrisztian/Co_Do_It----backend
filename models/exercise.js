@@ -15,8 +15,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   exercise.init(
     {
-      description: DataTypes.STRING,
-      explanation: DataTypes.TEXT,
+      description: { type: DataTypes.STRING, allowNull: false },
+      explanation: { type: DataTypes.TEXT, allowNull: false },
+      isPublic: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
     },
     {
       sequelize,
