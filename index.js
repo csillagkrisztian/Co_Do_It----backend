@@ -4,9 +4,16 @@ const corsMiddleWare = require("cors");
 const { PORT } = require("./config/constants");
 const authRouter = require("./routers/auth");
 const exerciseRouter = require("./routers/exercises");
+const socketIoRouter = require("./routers/socketIo");
 const authMiddleWare = require("./auth/middleware");
+const http = require("http");
+const socketIo = require("socket.io");
 
 const app = express();
+
+const server = http.createServer(app);
+
+const io = socketIo(server);
 
 /**
  * Middlewares
@@ -16,6 +23,11 @@ const app = express();
  *
  */
 
+/**
+ * a necessary router for Socket.io to
+ */
+
+app.use(socketIoRouter);
 /**
  * morgan:
  *
@@ -115,22 +127,19 @@ if (process.env.DELAY) {
  */
 
 /**
- * Routes
+ * Socket.io
  *
- * Define your routes here (now that middlewares are configured)
+ * Now we will get our hands dirty with some real time web sockets
  */
 
-// GET endpoint for testing purposes, can be removed
-app.get("/", (req, res) => {
-  res.send("Hi from express");
-});
+io.on("connection", (socket) => {
+  console.log("Connected");
 
-// POST endpoint for testing purposes, can be removed
-app.post("/echo", (req, res) => {
-  res.json({
-    youPosted: {
-      ...req.body,
-    },
+  socket.on("joined", (user) => {
+    console.log(user.name || "guest");
+  });
+  socket.on("disconnect", () => {
+    console.log("Disconnected");
   });
 });
 
@@ -156,6 +165,6 @@ app.use("/exercises", exerciseRouter);
 
 // Listen for connections on specified port (default is port 4000)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });
