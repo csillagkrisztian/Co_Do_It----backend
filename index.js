@@ -9,6 +9,14 @@ const authMiddleWare = require("./auth/middleware");
 const http = require("http");
 const socketIo = require("socket.io");
 
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getAll,
+  getUsersInRoom,
+} = require("./users");
+
 const app = express();
 
 const server = http.createServer(app);
@@ -133,13 +141,24 @@ if (process.env.DELAY) {
  */
 
 io.on("connection", (socket) => {
-  console.log("Connected");
-
-  socket.on("joined", (user) => {
-    console.log(user.name || "guest");
+  socket.on("joined", (userObject) => {
+    const { id, name, room } = userObject;
+    console.log("Connected!");
+    addUser({ id, name, room });
+    const all = getAll();
+    console.log("ALL", all);
+    const usersInRoom = getUsersInRoom(room);
+    console.log("usersInRoom connected", usersInRoom);
   });
-  socket.on("disconnect", () => {
-    console.log("Disconnected");
+
+  socket.on("unjoined", (userObject) => {
+    const { id, room } = userObject;
+    console.log("Disconnected!");
+    removeUser(id);
+    const usersInRoom = getUsersInRoom(room);
+    const all = getAll();
+    console.log("ALL", all);
+    console.log("usersInRoom disconnected", usersInRoom);
   });
 });
 
