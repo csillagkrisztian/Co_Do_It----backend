@@ -1,9 +1,30 @@
 const users = [];
+const rooms = [];
+
+const setSelected = (id, exercise, room) => {
+  const currentRoom = { id, exercise, room: room.trim().toLowerCase() };
+  rooms.push(currentRoom);
+  console.log(rooms);
+  return room;
+};
+
+const getRoom = (roomName) =>
+  rooms.find((room) => {
+    return room.room === roomName.trim().toLowerCase();
+  });
+
+const removeRoom = (roomName) => {
+  const room = rooms.find((room) => {
+    return room.room === roomName.trim().toLowerCase();
+  });
+  const index = rooms.indexOf(room);
+  if (index !== -1) {
+    return rooms.splice(index, 1)[0];
+  }
+};
 
 const addUser = ({ id, name, room }) => {
-  if (!name) {
-    name = "guest";
-  }
+  console.log(id, name, room);
   name = name.trim().toLowerCase();
   room = room.trim().toLowerCase();
 
@@ -35,4 +56,12 @@ const getAll = (room) => {
   return users.filter((user) => user.room === room.trim().toLowerCase());
 };
 
-module.exports = { addUser, removeUser, getUser, getAll };
+module.exports = {
+  addUser,
+  removeUser,
+  getUser,
+  getAll,
+  setSelected,
+  getRoom,
+  removeRoom,
+};

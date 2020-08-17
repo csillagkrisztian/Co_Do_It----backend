@@ -9,7 +9,15 @@ const authMiddleWare = require("./auth/middleware");
 const http = require("http");
 const socketIo = require("socket.io");
 
-const { addUser, removeUser, getUser, getAll } = require("./users");
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getAll,
+  setSelected,
+  getRoom,
+  removeRoom,
+} = require("./users");
 
 const app = express();
 
@@ -137,22 +145,52 @@ if (process.env.DELAY) {
 io.on("connection", (socket) => {
   socket.on("joined", (userObject, callback) => {
     const { id, name, room } = userObject;
-    console.log("Connected!");
     addUser({ id, name, room });
-    const all = getAll(room);
-    console.log("ALL", all);
-    socket.emit("refresh", all);
+    socket.join(room);
+    const roomMembers = getAll(room);
+    io.to(room).emit("refresh", roomMembers);
+  });
+
+  socket.on("add exercise", ({ id, exercise, room }) => {
+    setSelected(id, exercise, room);
+    io.to(room).emit("exercise", exercise);
   });
 
   socket.on("unjoined", (userObject, callback) => {
     const { id, room } = userObject;
-    console.log("Disconnected!");
     const user = getUser(id);
+    if (!user) {
+      return;
+    }
     removeUser(user.id);
-    console.log;
-    const all = getAll(room);
-    console.log("ALL", all);
-    socket.emit("refresh", all);
+    const roomMembers = getAll(room);
+    if (!roomMembers) {
+      removeRoom(room);
+    }
+    io.to(room).emit("refresh", roomMembers);
+  });
+
+  socket.on("i want exercise", (room) => {
+    const neededRoom = getRoom(room);
+    if (!neededRoom) {
+      console.log(`${room} not found`);
+    } else {
+      socket.to(room).emit("exercise", neededRoom.exercise);
+    }
+  });
+
+  socket.on("disconnect", (userObject, callback) => {
+    const { id, room } = userObject;
+    const user = getUser(id);
+    if (!user) {
+      return;
+    }
+    removeUser(user.id);
+    if (!roomMembers) {
+      removeRoom(room);
+    }
+    const roomMembers = getAll(room);
+    io.to(room).emit("refresh", roomMembers);
   });
 });
 
