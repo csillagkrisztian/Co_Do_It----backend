@@ -1,5 +1,30 @@
 const users = [];
 const rooms = [];
+const finishedUsers = [];
+
+const addFinishedUser = (id, name, room) => {
+  name = name.trim().toLowerCase();
+  room = room.trim().toLowerCase();
+
+  const existingUser = finishedUsers.find(
+    (user) => user.room === room && user.id === id
+  );
+
+  if (existingUser) {
+    return { error: "You already submitted your code!" };
+  }
+
+  const user = { id, name, room };
+  finishedUsers.push(user);
+
+  return { user };
+};
+
+const getAllFinished = (room) => {
+  return finishedUsers.filter(
+    (user) => user.room === room.trim().toLowerCase()
+  );
+};
 
 const createRoom = (id, exercise, room) => {
   const currentRoom = { id, exercise, room: room.trim().toLowerCase() };
@@ -62,4 +87,6 @@ module.exports = {
   createRoom,
   getRoom,
   removeRoom,
+  addFinishedUser,
+  getAllFinished,
 };

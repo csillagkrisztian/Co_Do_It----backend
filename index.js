@@ -17,6 +17,8 @@ const {
   createRoom,
   getRoom,
   removeRoom,
+  addFinishedUser,
+  getAllFinished,
 } = require("./users");
 
 const app = express();
@@ -154,6 +156,13 @@ io.on("connection", (socket) => {
   socket.on("add exercise", ({ id, exercise, room }) => {
     createRoom(id, exercise, room);
     io.to(room).emit("exercise", exercise);
+  });
+
+  socket.on("success", (userObject) => {
+    const { id, name, room } = userObject;
+    addFinishedUser(id, name, room);
+    const finishedUsers = getAllFinished(room);
+    io.to(room).emit("star refresh", finishedUsers);
   });
 
   socket.on("unjoined", (userObject, callback) => {
