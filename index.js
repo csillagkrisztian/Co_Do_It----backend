@@ -4,9 +4,26 @@ const corsMiddleWare = require("cors");
 const { PORT } = require("./config/constants");
 const authRouter = require("./routers/auth");
 const exerciseRouter = require("./routers/exercises");
+const socketIoRouter = require("./routers/socketIo");
 const authMiddleWare = require("./auth/middleware");
+const http = require("http");
+const socketIo = require("socket.io");
+
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getAll,
+  createRoom,
+  getRoom,
+  removeRoom,
+} = require("./users");
 
 const app = express();
+
+const server = http.createServer(app);
+
+const io = socketIo(server);
 
 /**
  * Middlewares
@@ -16,6 +33,11 @@ const app = express();
  *
  */
 
+/**
+ * a necessary router for Socket.io to
+ */
+
+app.use(socketIoRouter);
 /**
  * morgan:
  *
@@ -115,39 +137,69 @@ if (process.env.DELAY) {
  */
 
 /**
- * Routes
+ * Socket.io
  *
- * Define your routes here (now that middlewares are configured)
+ * Now we will get our hands dirty with some real time web sockets
  */
 
-// GET endpoint for testing purposes, can be removed
-app.get("/", (req, res) => {
-  res.send("Hi from express");
-});
-
-// POST endpoint for testing purposes, can be removed
-app.post("/echo", (req, res) => {
-  res.json({
-    youPosted: {
-      ...req.body,
-    },
+io.on("connection", (socket) => {
+  socket.on("joined", (userObject, callback) => {
+    const { id, name, room } = userObject;
+    addUser({ id, name, room });
+    socket.join(room);
+    const roomMembers = getAll(room);
+    io.to(room).emit("refresh", roomMembers);
   });
-});
 
-// POST endpoint which requires a token for testing purposes, can be removed
-app.post("/authorized_post_request", authMiddleWare, (req, res) => {
-  // accessing user that was added to req by the auth middleware
-  const user = req.user;
-  // don't send back the password hash
-  delete user.dataValues["password"];
+  socket.on("add exercise", ({ id, exercise, room }) => {
+    createRoom(id, exercise, room);
+    io.to(room).emit("exercise", exercise);
+  });
 
-  res.json({
-    youPosted: {
-      ...req.body,
-    },
-    userFoundWithToken: {
-      ...user.dataValues,
-    },
+  socket.on("unjoined", (userObject, callback) => {
+    const { id, room } = userObject;
+    const user = getUser(id);
+    if (!user) {
+      return;
+    }
+    removeUser(user.id);
+    const roomMembers = getAll(room);
+    if (!roomMembers) {
+      removeRoom(room);
+    }
+    io.to(room).emit("refresh", roomMembers);
+  });
+
+  socket.on("delete previous room", (room) => {
+    const neededRoom = getRoom(room);
+    if (!neededRoom) {
+      console.log(`${room} not found`);
+    } else {
+      removeRoom(room);
+    }
+  });
+
+  socket.on("i want exercise", (room) => {
+    const neededRoom = getRoom(room);
+    if (!neededRoom) {
+      console.log(`${room} not found`);
+    } else {
+      socket.to(room).emit("exercise", neededRoom.exercise);
+    }
+  });
+
+  socket.on("disconnect", (userObject, callback) => {
+    const { id, room } = userObject;
+    const user = getUser(id);
+    if (!user) {
+      return;
+    }
+    removeUser(user.id);
+    if (!roomMembers) {
+      removeRoom(room);
+    }
+    const roomMembers = getAll(room);
+    io.to(room).emit("refresh", roomMembers);
   });
 });
 
@@ -156,6 +208,6 @@ app.use("/exercises", exerciseRouter);
 
 // Listen for connections on specified port (default is port 4000)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });

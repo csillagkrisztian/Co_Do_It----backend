@@ -2,8 +2,19 @@ const { Router, response } = require("express");
 const Exercise = require("../models").exercise;
 const TestCase = require("../models").testCase;
 const authMiddleware = require("../auth/middleware");
+const { Op } = require("sequelize");
 
 const router = new Router();
+
+router.get("/", authMiddleware, async (req, res, next) => {
+  const userId = req.user.dataValues.id;
+  const exercises = await Exercise.findAll({
+    include: [TestCase],
+    where: { [Op.or]: [{ isPublic: true }, { userId: userId }] },
+  });
+
+  res.status(200).send(exercises);
+});
 
 router.get("/random", async (req, res, next) => {
   function getRandomInt(max) {
