@@ -14,7 +14,7 @@ const {
   removeUser,
   getUser,
   getAll,
-  setSelected,
+  createRoom,
   getRoom,
   removeRoom,
 } = require("./users");
@@ -152,7 +152,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("add exercise", ({ id, exercise, room }) => {
-    setSelected(id, exercise, room);
+    createRoom(id, exercise, room);
     io.to(room).emit("exercise", exercise);
   });
 
@@ -168,6 +168,15 @@ io.on("connection", (socket) => {
       removeRoom(room);
     }
     io.to(room).emit("refresh", roomMembers);
+  });
+
+  socket.on("delete previous room", (room) => {
+    const neededRoom = getRoom(room);
+    if (!neededRoom) {
+      console.log(`${room} not found`);
+    } else {
+      removeRoom(room);
+    }
   });
 
   socket.on("i want exercise", (room) => {
@@ -191,23 +200,6 @@ io.on("connection", (socket) => {
     }
     const roomMembers = getAll(room);
     io.to(room).emit("refresh", roomMembers);
-  });
-});
-
-// POST endpoint which requires a token for testing purposes, can be removed
-app.post("/authorized_post_request", authMiddleWare, (req, res) => {
-  // accessing user that was added to req by the auth middleware
-  const user = req.user;
-  // don't send back the password hash
-  delete user.dataValues["password"];
-
-  res.json({
-    youPosted: {
-      ...req.body,
-    },
-    userFoundWithToken: {
-      ...user.dataValues,
-    },
   });
 });
 

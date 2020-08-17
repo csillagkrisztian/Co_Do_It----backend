@@ -1,10 +1,9 @@
 const users = [];
 const rooms = [];
 
-const setSelected = (id, exercise, room) => {
+const createRoom = (id, exercise, room) => {
   const currentRoom = { id, exercise, room: room.trim().toLowerCase() };
   rooms.push(currentRoom);
-  console.log(rooms);
   return room;
 };
 
@@ -24,7 +23,6 @@ const removeRoom = (roomName) => {
 };
 
 const addUser = ({ id, name, room }) => {
-  console.log(id, name, room);
   name = name.trim().toLowerCase();
   room = room.trim().toLowerCase();
 
@@ -61,7 +59,7 @@ module.exports = {
   removeUser,
   getUser,
   getAll,
-  setSelected,
+  createRoom,
   getRoom,
   removeRoom,
 };
