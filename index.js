@@ -154,6 +154,17 @@ io.on("connection", (socket) => {
     io.to(room).emit("refresh", roomMembers);
   });
 
+  socket.on("winner", (userObject) => {
+    const { room } = userObject;
+    removeRoom(room);
+    io.to(room).emit("set winner", userObject);
+  });
+
+  socket.on("reset game", (room) => {
+    console.log("set Play!");
+    io.to(room).emit("set play again", room);
+  });
+
   socket.on("add exercise", ({ id, exercise, room }) => {
     createRoom(id, exercise, room);
     io.to(room).emit("exercise", exercise);
