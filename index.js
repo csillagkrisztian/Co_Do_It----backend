@@ -17,6 +17,9 @@ const {
   createRoom,
   getRoom,
   removeRoom,
+  addFinishedUser,
+  getAllFinished,
+  removeAllFinished,
 } = require("./users");
 
 const app = express();
@@ -156,6 +159,20 @@ io.on("connection", (socket) => {
     io.to(room).emit("exercise", exercise);
   });
 
+  socket.on("success", (userObject, code) => {
+    const { id, name, room } = userObject;
+    addFinishedUser(id, name, room, code);
+    const finishedUsers = getAllFinished(room);
+    io.to(room).emit("star refresh", finishedUsers);
+  });
+
+  socket.on("clear all finished", (room) => {
+    const freshFinished = removeAllFinished(room);
+    removeRoom(room);
+    io.to(room).emit("new exercise");
+    io.to(room).emit("star refresh", freshFinished);
+  });
+
   socket.on("unjoined", (userObject, callback) => {
     const { id, room } = userObject;
     const user = getUser(id);
@@ -182,7 +199,7 @@ io.on("connection", (socket) => {
   socket.on("i want exercise", (room) => {
     const neededRoom = getRoom(room);
     if (!neededRoom) {
-      console.log(`${room} not found`);
+      console.log("class hasn't started yet!");
     } else {
       socket.to(room).emit("exercise", neededRoom.exercise);
     }
