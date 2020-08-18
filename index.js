@@ -156,6 +156,7 @@ io.on("connection", (socket) => {
 
   socket.on("add exercise", ({ id, exercise, room }) => {
     createRoom(id, exercise, room);
+    console.log({ id, exercise, room });
     io.to(room).emit("exercise", exercise);
   });
 

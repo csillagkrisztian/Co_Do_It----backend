@@ -3,7 +3,6 @@ const rooms = [];
 let finishedUsers = [];
 
 const addFinishedUser = (id, name, room, code) => {
-  name = name.trim().toLowerCase();
   room = room.trim().toLowerCase();
 
   const existingUser = finishedUsers.find(
@@ -55,7 +54,6 @@ const removeRoom = (roomName) => {
 };
 
 const addUser = ({ id, name, room }) => {
-  name = name.trim().toLowerCase();
   room = room.trim().toLowerCase();
 
   const existingUser = users.find(
