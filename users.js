@@ -1,5 +1,5 @@
 const users = [];
-const rooms = [];
+let rooms = [];
 let finishedUsers = [];
 
 const addFinishedUser = (id, name, room, code) => {
@@ -33,9 +33,17 @@ const removeAllFinished = (room) => {
 };
 
 const createRoom = (id, exercise, room) => {
-  const currentRoom = { id, exercise, room: room.trim().toLowerCase() };
-  rooms.push(currentRoom);
-  return room;
+  const duplicate = rooms.find((roomObject) => {
+    roomObject.room === room.toLowerCase().trim();
+  });
+  console.log(duplicate);
+  if (duplicate) {
+    console.log("that one already exists!");
+  } else {
+    const currentRoom = { id, exercise, room: room.trim().toLowerCase() };
+    rooms.push(currentRoom);
+    return room;
+  }
 };
 
 const getRoom = (roomName) =>
@@ -44,13 +52,12 @@ const getRoom = (roomName) =>
   });
 
 const removeRoom = (roomName) => {
-  const room = rooms.find((room) => {
-    return room.room === roomName.trim().toLowerCase();
+  const remainingRooms = rooms.filter((room) => {
+    console.log("What I have", roomName, "What I need", room.room);
+    return room.room !== roomName.trim().toLowerCase();
   });
-  const index = rooms.indexOf(room);
-  if (index !== -1) {
-    return rooms.splice(index, 1)[0];
-  }
+  rooms = remainingRooms;
+  return [];
 };
 
 const addUser = ({ id, name, room }) => {
