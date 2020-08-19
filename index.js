@@ -6,6 +6,7 @@ const authRouter = require("./routers/auth");
 const exerciseRouter = require("./routers/exercises");
 const socketIoRouter = require("./routers/socketIo");
 const usersRouter = require("./routers/users");
+const teacherRouter = require("./routers/teachers");
 const authMiddleWare = require("./auth/middleware");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -148,10 +149,12 @@ if (process.env.DELAY) {
 
 io.on("connection", (socket) => {
   socket.on("joined", (userObject, callback) => {
-    const { id, name, room } = userObject;
-    addUser({ id, name, room });
+    const { imageUrl, id, name, room } = userObject;
+    console.log(imageUrl);
+    addUser({ imageUrl, id, name, room });
     socket.join(room);
     const roomMembers = getAll(room);
+    console.log(roomMembers);
     io.to(room).emit("refresh", roomMembers);
   });
 
@@ -237,6 +240,7 @@ io.on("connection", (socket) => {
 app.use("/users", usersRouter);
 app.use("/", authRouter);
 app.use("/exercises", exerciseRouter);
+app.use("/teachers", teacherRouter);
 
 // Listen for connections on specified port (default is port 4000)
 
