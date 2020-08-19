@@ -8,12 +8,13 @@ async function auth(req, res, next) {
   if (!auth || !auth[0] === "Bearer" || !auth[1]) {
     res.status(401).send({
       message:
-        "This endpoint requires an Authorization header with a valid token"
+        "This endpoint requires an Authorization header with a valid token",
     });
   }
 
   try {
     const data = toData(auth[1]);
+    req.neededData = data;
     const user = await User.findByPk(data.userId);
     if (!user) {
       return res.status(404).send({ message: "User does not exist" });
@@ -39,7 +40,7 @@ async function auth(req, res, next) {
 
       default:
         return res.status(400).send({
-          message: "Something went wrong, sorry"
+          message: "Something went wrong, sorry",
         });
     }
   }

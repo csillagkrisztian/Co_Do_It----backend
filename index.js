@@ -5,6 +5,7 @@ const { PORT } = require("./config/constants");
 const authRouter = require("./routers/auth");
 const exerciseRouter = require("./routers/exercises");
 const socketIoRouter = require("./routers/socketIo");
+const usersRouter = require("./routers/users");
 const authMiddleWare = require("./auth/middleware");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -231,6 +232,9 @@ io.on("connection", (socket) => {
   });
 });
 
+// Access routers that are in different files
+
+app.use("/users", usersRouter);
 app.use("/", authRouter);
 app.use("/exercises", exerciseRouter);
 
