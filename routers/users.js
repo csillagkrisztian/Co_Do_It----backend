@@ -16,6 +16,12 @@ router.get(
   }
 );
 
+router.get("/", authMiddleware, async (req, res, next) => {
+  const users = await User.findAll();
+  const userNames = users.map((u) => u.dataValues.name);
+  res.status(200).send(userNames);
+});
+
 router.patch(
   "/:id",
   validation(User, "id", "validationUser"),

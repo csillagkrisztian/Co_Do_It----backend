@@ -60,7 +60,7 @@ const removeRoom = (roomName) => {
   return [];
 };
 
-const addUser = ({ id, name, room }) => {
+const addUser = ({ imageUrl, id, name, room }) => {
   room = room.trim().toLowerCase();
 
   const existingUser = users.find(
@@ -71,7 +71,7 @@ const addUser = ({ id, name, room }) => {
     return { error: "this user already is in the Classroom" };
   }
 
-  const user = { id, name, room };
+  const user = { imageUrl, id, name, room };
   users.push(user);
 
   return { user };
