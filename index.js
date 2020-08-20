@@ -22,6 +22,7 @@ const {
   addFinishedUser,
   getAllFinished,
   removeAllFinished,
+  getAllData,
 } = require("./users");
 
 const app = express();
@@ -155,22 +156,30 @@ io.on("connection", (socket) => {
     socket.join(room);
     const roomMembers = getAll(room);
     console.log(roomMembers);
+    console.log("connection");
+    getAllData();
+
     io.to(room).emit("refresh", roomMembers);
   });
 
   socket.on("winner", (userObject) => {
     const { room } = userObject;
     removeRoom(room);
+    console.log("winner");
+    getAllData();
     io.to(room).emit("set winner", userObject);
   });
 
   socket.on("reset game", (room) => {
-    console.log("set Play!");
+    console.log("reset game");
+    getAllData();
     io.to(room).emit("set play again", room);
   });
 
   socket.on("add exercise", ({ id, exercise, room }) => {
     createRoom(id, exercise, room);
+    console.log("add exercise");
+    getAllData();
     io.to(room).emit("exercise", exercise);
   });
 
@@ -178,12 +187,17 @@ io.on("connection", (socket) => {
     const { id, name, room } = userObject;
     addFinishedUser(id, name, room, code);
     const finishedUsers = getAllFinished(room);
+    console.log("success");
+    getAllData();
     io.to(room).emit("star refresh", finishedUsers);
   });
 
   socket.on("clear all finished", (room) => {
     const freshFinished = removeAllFinished(room);
     removeRoom(room);
+    console.log("clear all finished");
+    getAllData();
+
     io.to(room).emit("new exercise");
     io.to(room).emit("star refresh", freshFinished);
   });
@@ -196,42 +210,38 @@ io.on("connection", (socket) => {
     }
     removeUser(user.id);
     const roomMembers = getAll(room);
-    if (!roomMembers) {
+    const roomWordsArray = room.split(" ");
+
+    console.log("thing", roomWordsArray[3], "other thing", user.name);
+    if (roomWordsArray[3] === user.name) {
       removeRoom(room);
     }
+    console.log("unjoined");
+    getAllData();
     io.to(room).emit("refresh", roomMembers);
   });
 
   socket.on("delete previous room", (room) => {
     const neededRoom = getRoom(room);
+    getAllData();
     if (!neededRoom) {
       console.log(`${room} not found`);
     } else {
       removeRoom(room);
+      console.log("delete previous room");
     }
   });
 
   socket.on("i want exercise", (room) => {
     const neededRoom = getRoom(room);
+
     if (!neededRoom) {
       console.log("class hasn't started yet!");
     } else {
+      console.log("I want exercise");
+      getAllData();
       socket.to(room).emit("exercise", neededRoom.exercise);
     }
-  });
-
-  socket.on("disconnect", (userObject, callback) => {
-    const { id, room } = userObject;
-    const user = getUser(id);
-    if (!user) {
-      return;
-    }
-    removeUser(user.id);
-    if (!roomMembers) {
-      removeRoom(room);
-    }
-    const roomMembers = getAll(room);
-    io.to(room).emit("refresh", roomMembers);
   });
 });
 
