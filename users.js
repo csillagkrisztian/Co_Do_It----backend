@@ -2,6 +2,12 @@ const users = [];
 let rooms = [];
 let finishedUsers = [];
 
+const getAllData = () => {
+  console.log("users", users);
+  console.log("rooms", rooms);
+  console.log("finishedUsers", finishedUsers);
+};
+
 const addFinishedUser = (id, name, room, code) => {
   room = room.trim().toLowerCase();
 
@@ -33,9 +39,9 @@ const removeAllFinished = (room) => {
 };
 
 const createRoom = (id, exercise, room) => {
-  const duplicate = rooms.find((roomObject) => {
-    roomObject.room === room.toLowerCase().trim();
-  });
+  const duplicate = rooms.find(
+    (roomObject) => roomObject.room === room.toLowerCase().trim()
+  );
   console.log(duplicate);
   if (duplicate) {
     console.log("that one already exists!");
@@ -60,7 +66,7 @@ const removeRoom = (roomName) => {
   return [];
 };
 
-const addUser = ({ id, name, room }) => {
+const addUser = ({ imageUrl, id, name, room }) => {
   room = room.trim().toLowerCase();
 
   const existingUser = users.find(
@@ -71,7 +77,7 @@ const addUser = ({ id, name, room }) => {
     return { error: "this user already is in the Classroom" };
   }
 
-  const user = { id, name, room };
+  const user = { imageUrl, id, name, room };
   users.push(user);
 
   return { user };
@@ -102,4 +108,5 @@ module.exports = {
   addFinishedUser,
   getAllFinished,
   removeAllFinished,
+  getAllData,
 };
