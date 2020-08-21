@@ -1,3 +1,5 @@
+# This is the back end of CO_DO_IT, if you want to see details about it click [HERE](https://github.com/csillagkrisztian/Co_Do_It---front)
+
 ## History of this project
 
 - [Setup of the server](https://github.com/Codaisseur/express-template/commit/cd2f790fbab6c561300163466a074fd09a35f704)
