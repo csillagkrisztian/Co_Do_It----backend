@@ -23,7 +23,7 @@ const {
   getAllFinished,
   removeAllFinished,
   getAllData,
-} = require("./users");
+} = require("./socketIoData");
 
 const app = express();
 
@@ -42,11 +42,6 @@ const io = socketIo(server);
 /**
  * a necessary router for Socket.io to
  */
-
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
 
 app.use(socketIoRouter);
 /**
